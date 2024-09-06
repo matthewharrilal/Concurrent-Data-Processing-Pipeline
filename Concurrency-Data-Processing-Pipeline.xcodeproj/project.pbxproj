@@ -100,9 +100,6 @@
 			isa = PBXGroup;
 			children = (
 				76C15DC92C8B53B30055E2D6 /* View Controllers */,
-				76C15DC82C8B53A90055E2D6 /* Services */,
-				76C15DC72C8B53A30055E2D6 /* Actors */,
-				76C15DC62C8B539D0055E2D6 /* Executors */,
 				76C15D962C8B53630055E2D6 /* AppDelegate.swift */,
 				76C15D982C8B53630055E2D6 /* SceneDelegate.swift */,
 				76C15D9C2C8B53630055E2D6 /* Main.storyboard */,
@@ -128,27 +125,6 @@
 				76C15DB92C8B53650055E2D6 /* Concurrency_Data_Processing_PipelineUITestsLaunchTests.swift */,
 			);
 			path = "Concurrency-Data-Processing-PipelineUITests";
-			sourceTree = "<group>";
-		};
-		76C15DC62C8B539D0055E2D6 /* Executors */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Executors;
-			sourceTree = "<group>";
-		};
-		76C15DC72C8B53A30055E2D6 /* Actors */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Actors;
-			sourceTree = "<group>";
-		};
-		76C15DC82C8B53A90055E2D6 /* Services */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Services;
 			sourceTree = "<group>";
 		};
 		76C15DC92C8B53B30055E2D6 /* View Controllers */ = {
