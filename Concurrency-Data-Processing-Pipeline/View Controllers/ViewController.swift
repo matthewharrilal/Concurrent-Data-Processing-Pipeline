@@ -24,8 +24,30 @@ class TestViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        Task {
-            await networkService.executeDownloadTask()
+        let queue = DispatchQueue.global(qos: .userInitiated)
+        
+        queue.async { [weak self] in
+            Task {
+                await self?.networkService.executeDownloadTask(priority: .veryHigh, jobNumber: 1)
+            }
+        }
+        
+        queue.async { [weak self] in
+            Task {
+                await self?.networkService.executeDownloadTask(priority: .veryLow, jobNumber: 2)
+            }
+        }
+        
+        queue.async { [weak self] in
+            Task {
+                await self?.networkService.executeDownloadTask(priority: .normal, jobNumber: 3)
+            }
+        }
+        
+        queue.async { [weak self] in
+            Task {
+                await self?.networkService.executeDownloadTask(priority: .low, jobNumber: 4)
+            }
         }
     }
 }

@@ -19,6 +19,7 @@
 		76C15DD02C8B634C0055E2D6 /* ConcurrentDownloadExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C15DCF2C8B634C0055E2D6 /* ConcurrentDownloadExecutor.swift */; };
 		76C15DD22C8B65AC0055E2D6 /* ConcurrentDownloadActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C15DD12C8B65AC0055E2D6 /* ConcurrentDownloadActor.swift */; };
 		76C15DD42C8B671B0055E2D6 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C15DD32C8B671B0055E2D6 /* NetworkService.swift */; };
+		76C15DD72C8BB0770055E2D6 /* DownloadOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C15DD62C8BB0770055E2D6 /* DownloadOperation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -55,6 +56,7 @@
 		76C15DCF2C8B634C0055E2D6 /* ConcurrentDownloadExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentDownloadExecutor.swift; sourceTree = "<group>"; };
 		76C15DD12C8B65AC0055E2D6 /* ConcurrentDownloadActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentDownloadActor.swift; sourceTree = "<group>"; };
 		76C15DD32C8B671B0055E2D6 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
+		76C15DD62C8BB0770055E2D6 /* DownloadOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadOperation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -105,6 +107,7 @@
 		76C15D952C8B53630055E2D6 /* Concurrency-Data-Processing-Pipeline */ = {
 			isa = PBXGroup;
 			children = (
+				76C15DD52C8BB06B0055E2D6 /* Operations */,
 				76C15DCE2C8B63270055E2D6 /* Services */,
 				76C15DCD2C8B63210055E2D6 /* Executors */,
 				76C15DCC2C8B631D0055E2D6 /* Actors */,
@@ -166,6 +169,14 @@
 				76C15DD32C8B671B0055E2D6 /* NetworkService.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		76C15DD52C8BB06B0055E2D6 /* Operations */ = {
+			isa = PBXGroup;
+			children = (
+				76C15DD62C8BB0770055E2D6 /* DownloadOperation.swift */,
+			);
+			path = Operations;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -301,6 +312,7 @@
 			files = (
 				76C15D9B2C8B53630055E2D6 /* ViewController.swift in Sources */,
 				76C15DD22C8B65AC0055E2D6 /* ConcurrentDownloadActor.swift in Sources */,
+				76C15DD72C8BB0770055E2D6 /* DownloadOperation.swift in Sources */,
 				76C15D972C8B53630055E2D6 /* AppDelegate.swift in Sources */,
 				76C15DD02C8B634C0055E2D6 /* ConcurrentDownloadExecutor.swift in Sources */,
 				76C15DD42C8B671B0055E2D6 /* NetworkService.swift in Sources */,

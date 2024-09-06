@@ -15,7 +15,7 @@ final class ConcurrentDownloadExecutor: Executor {
     
     private var onCompletion: (() -> Void)?
     
-    func enqueue(_ job: consuming ExecutorJob) {
+    func enqueue(_ job: UnownedJob) {
         queue.async { [weak self] in
             guard let self = self else { return }
             self.executeJob()

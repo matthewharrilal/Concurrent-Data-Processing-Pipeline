@@ -20,6 +20,10 @@ actor ConcurrentDownloadActor {
         self.customExecutor = customExecutor
     }
     
+    nonisolated var executor: some Executor {
+        return ConcurrentDownloadExecutor()
+    }
+    
     func performDownload() async {
         counter += 1
         guard counter < maximumOperations else {
@@ -28,11 +32,11 @@ actor ConcurrentDownloadActor {
             return
         }
         
-        let downloadJob: () -> Void = {
-            print("Downloading ... Beep Boop Beep")
-        }
+//        let downloadJob: () -> Void = {
+//            print("Downloading ... Beep Boop Beep")
+//        }
         
         print("Downloading ... Beep Boop Beep")
-        customExecutor.enqueue(downloadJob)
+//        customExecutor.enqueue(downloadJob)
     }
 }
