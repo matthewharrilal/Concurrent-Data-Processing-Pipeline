@@ -18,6 +18,8 @@ class NetworkService: NetworkProtocol {
     private let maxConcurrentTransformationOperations: Int
     private let maxConcurrentSaveOperations: Int
     
+    private var pendingDownloadOperations: [DownloadOperation] = []
+    
     private var counter: Int = 0
     private let lock = NSLock()
     private lazy var counterQueue = DispatchQueue(label: "serial.counterQueue")
@@ -30,7 +32,7 @@ class NetworkService: NetworkProtocol {
     }()
 
     init(
-        maxConcurrentDownloadOperations: Int = 5,
+        maxConcurrentDownloadOperations: Int = 1,
         maxConcurrentTransformationOperations: Int = 2,
         maxConcurrentSaveOperations: Int = 1
     ) {
@@ -44,13 +46,23 @@ class NetworkService: NetworkProtocol {
             counter += 1
         }
         
-        guard counter < maxConcurrentDownloadOperations else {
-            counterQueue.sync {
-                counter -= 1
+        guard counter <= maxConcurrentDownloadOperations else {
+            counterQueue.sync { [weak self] in
+                guard let self = self else { return }
+                self.counter -= 1
+                
+                print("")
+                print("Reached max number of concurrent download operations. We will invoke this pending download task once an existing task completes.")
+                
+                self.pendingDownloadOperations.append(
+                    DownloadOperation(
+                        jobNumber: jobNumber, 
+                        automaticallyStartDownloadTask: false
+                    )
+                )
+                return
             }
-
-            print("")
-            print("Reached max number of concurrent download operations. Please invoke download task once one completes.")
+            
             return
         }
         
@@ -69,8 +81,31 @@ class NetworkService: NetworkProtocol {
                 self.counter -= 1
             }
             
+            handlePendingDownloadTasks()
         }
         
         downloadOperationQueue.addOperation(downloadOperation)
+    }
+    
+    private func handlePendingDownloadTasks() {
+        counterQueue.sync {
+            guard pendingDownloadOperations.count > 0 else {
+                print("")
+                print("No pending download tasks to handle.")
+                return
+            }
+
+            let pendingOperation = pendingDownloadOperations.removeFirst()
+            
+            print("")
+            print("Re-trying previously pending task job #\(pendingOperation.jobNumber)")
+            pendingOperation.startDownloadTask = true
+            counter += 1
+            
+            pendingOperation.onFinished = { jobNumber in
+                print("")
+                print("Download operation complete for job #\(jobNumber)")
+            }
+        }
     }
 }

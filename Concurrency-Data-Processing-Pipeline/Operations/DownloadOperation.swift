@@ -12,7 +12,17 @@ class DownloadOperation: Operation {
     private var _isExecuting: Bool = false
     private var _isFinished: Bool = false
     
-    private let jobNumber: Int
+    private let _jobNumber: Int
+    
+    var jobNumber: Int {
+        _jobNumber
+    }
+    
+    var startDownloadTask: Bool {
+        didSet {
+            performDownloadTask()
+        }
+    }
     
     var onFinished: (@Sendable (Int) -> Void)?
     
@@ -24,8 +34,9 @@ class DownloadOperation: Operation {
         _isFinished
     }
     
-    init(jobNumber: Int) {
-        self.jobNumber = jobNumber
+    init(jobNumber: Int, automaticallyStartDownloadTask: Bool = true) {
+        self._jobNumber = jobNumber
+        self.startDownloadTask = automaticallyStartDownloadTask
         super.init()
     }
     
@@ -36,7 +47,10 @@ class DownloadOperation: Operation {
         }
         
         _isExecuting = true
-        performDownloadTask()
+        
+        if startDownloadTask {
+            performDownloadTask()
+        }
     }
     
     private func performDownloadTask() {
