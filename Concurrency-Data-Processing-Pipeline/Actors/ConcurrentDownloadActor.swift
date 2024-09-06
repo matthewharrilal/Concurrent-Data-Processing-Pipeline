@@ -32,10 +32,6 @@ actor ConcurrentDownloadActor {
             return
         }
         
-//        let downloadJob: () -> Void = {
-//            print("Downloading ... Beep Boop Beep")
-//        }
-        
         print("Downloading ... Beep Boop Beep")
 //        customExecutor.enqueue(downloadJob)
     }

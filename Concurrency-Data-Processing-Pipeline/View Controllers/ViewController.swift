@@ -24,6 +24,13 @@ class TestViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
+        simulateAsyncDownloadTasks()
+    }
+}
+
+extension TestViewController {
+    
+    private func simulateAsyncDownloadTasks() {
         let queue = DispatchQueue.global(qos: .userInitiated)
         
         queue.async { [weak self] in
