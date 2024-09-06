@@ -17,6 +17,8 @@
 		76C15DB82C8B53650055E2D6 /* Concurrency_Data_Processing_PipelineUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C15DB72C8B53650055E2D6 /* Concurrency_Data_Processing_PipelineUITests.swift */; };
 		76C15DBA2C8B53650055E2D6 /* Concurrency_Data_Processing_PipelineUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C15DB92C8B53650055E2D6 /* Concurrency_Data_Processing_PipelineUITestsLaunchTests.swift */; };
 		76C15DD02C8B634C0055E2D6 /* ConcurrentDownloadExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C15DCF2C8B634C0055E2D6 /* ConcurrentDownloadExecutor.swift */; };
+		76C15DD22C8B65AC0055E2D6 /* ConcurrentDownloadActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C15DD12C8B65AC0055E2D6 /* ConcurrentDownloadActor.swift */; };
+		76C15DD42C8B671B0055E2D6 /* NetworkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C15DD32C8B671B0055E2D6 /* NetworkService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -51,6 +53,8 @@
 		76C15DB72C8B53650055E2D6 /* Concurrency_Data_Processing_PipelineUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Concurrency_Data_Processing_PipelineUITests.swift; sourceTree = "<group>"; };
 		76C15DB92C8B53650055E2D6 /* Concurrency_Data_Processing_PipelineUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Concurrency_Data_Processing_PipelineUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		76C15DCF2C8B634C0055E2D6 /* ConcurrentDownloadExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentDownloadExecutor.swift; sourceTree = "<group>"; };
+		76C15DD12C8B65AC0055E2D6 /* ConcurrentDownloadActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConcurrentDownloadActor.swift; sourceTree = "<group>"; };
+		76C15DD32C8B671B0055E2D6 /* NetworkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -143,6 +147,7 @@
 		76C15DCC2C8B631D0055E2D6 /* Actors */ = {
 			isa = PBXGroup;
 			children = (
+				76C15DD12C8B65AC0055E2D6 /* ConcurrentDownloadActor.swift */,
 			);
 			path = Actors;
 			sourceTree = "<group>";
@@ -158,6 +163,7 @@
 		76C15DCE2C8B63270055E2D6 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				76C15DD32C8B671B0055E2D6 /* NetworkService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -294,8 +300,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				76C15D9B2C8B53630055E2D6 /* ViewController.swift in Sources */,
+				76C15DD22C8B65AC0055E2D6 /* ConcurrentDownloadActor.swift in Sources */,
 				76C15D972C8B53630055E2D6 /* AppDelegate.swift in Sources */,
 				76C15DD02C8B634C0055E2D6 /* ConcurrentDownloadExecutor.swift in Sources */,
+				76C15DD42C8B671B0055E2D6 /* NetworkService.swift in Sources */,
 				76C15D992C8B53630055E2D6 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
