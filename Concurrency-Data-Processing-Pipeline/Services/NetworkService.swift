@@ -32,7 +32,7 @@ class NetworkService: NetworkProtocol {
     }()
 
     init(
-        maxConcurrentDownloadOperations: Int = 1,
+        maxConcurrentDownloadOperations: Int = 3,
         maxConcurrentTransformationOperations: Int = 2,
         maxConcurrentSaveOperations: Int = 1
     ) {
@@ -41,53 +41,70 @@ class NetworkService: NetworkProtocol {
         self.maxConcurrentSaveOperations = maxConcurrentSaveOperations
     }
     
-    func executeDownloadTask(priority: Operation.QueuePriority, jobNumber: Int) async {
-        counterQueue.sync {
-            counter += 1
+    func startDownloadTask(_ operation: DownloadOperation, wasPreviouslyPending: Bool = false) {
+        print("Starting download task for job #\(operation.jobNumber)")
+        
+        if wasPreviouslyPending {
+            operation.startDownloadTask = true
         }
         
-        guard counter <= maxConcurrentDownloadOperations else {
-            counterQueue.sync { [weak self] in
-                guard let self = self else { return }
-                self.counter -= 1
-                
-                print("")
-                print("Reached max number of concurrent download operations. We will invoke this pending download task once an existing task completes.")
-                
-                self.pendingDownloadOperations.append(
-                    DownloadOperation(
-                        jobNumber: jobNumber, 
-                        automaticallyStartDownloadTask: false
-                    )
-                )
-                return
-            }
-            
-            return
-        }
-        
-        print("Starting download operation for job #\(jobNumber)")
-        print("")
-        let downloadOperation = DownloadOperation(jobNumber: jobNumber)
-        downloadOperation.queuePriority = priority
-        
-        downloadOperation.onFinished = { [weak self] jobNumber in
+        operation.onFinished = { [weak self] jobNumber in
             guard let self = self else {
                 print("Self has been deallocated")
                 return
             }
             
-            print("")
+            
             print("Download operation complete for job #\(jobNumber)")
-
-            counterQueue.sync {
-                self.counter -= 1
+            print("")
+            
+            self.counterQueue.sync {
+                self.counter -= 1 // Decrement counter of current operation since operation has been completed
+                
+                if wasPreviouslyPending {
+                    self.pendingDownloadOperations.removeFirst()
+                }
             }
             
             self.handlePendingDownloadTasks()
         }
         
-        downloadOperationQueue.addOperation(downloadOperation)
+        downloadOperationQueue.addOperation(operation)
+    }
+    
+    func executeDownloadTask(priority: Operation.QueuePriority, jobNumber: Int) async {
+        counterQueue.sync { [weak self] in
+            guard let self = self else { return }
+            self.counter += 1
+            
+            guard self.counter <= maxConcurrentDownloadOperations else {
+                self.counter -= 1
+                
+                print("")
+                print("Couldn't immedieately execute Job #\(jobNumber), will execute it after a task completes")
+                print("")
+                
+                lock.lock()
+                let pendingOperation = DownloadOperation(
+                    jobNumber: jobNumber,
+                    automaticallyStartDownloadTask: false
+                )
+                
+                pendingOperation.queuePriority = priority
+
+                
+                self.pendingDownloadOperations.append(
+                    pendingOperation
+                )
+                lock.unlock()
+                
+                return
+            }
+            
+            let downloadOperation = DownloadOperation(jobNumber: jobNumber)
+            downloadOperation.queuePriority = priority
+            startDownloadTask(downloadOperation)
+        }
     }
     
     /*
@@ -107,14 +124,11 @@ class NetworkService: NetworkProtocol {
             
             print("")
             print("Re-trying previously pending task job #\(pendingOperation.jobNumber)")
-            pendingOperation.startDownloadTask = true
+            print("")
+
             counter += 1
             
-            pendingOperation.onFinished = { [weak self] jobNumber in
-                print("")
-                print("Download operation complete for job #\(jobNumber)")
-                self?.pendingDownloadOperations.removeFirst()
-            }
+            startDownloadTask(pendingOperation, wasPreviouslyPending: true)
         }
     }
 }

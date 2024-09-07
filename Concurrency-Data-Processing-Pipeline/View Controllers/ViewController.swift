@@ -44,13 +44,13 @@ extension TestViewController {
                 await self?.networkService.executeDownloadTask(priority: .veryLow, jobNumber: 2)
             }
         }
-        
+     
         queue.async { [weak self] in
             Task {
                 await self?.networkService.executeDownloadTask(priority: .normal, jobNumber: 3)
             }
         }
-        
+//
 //        queue.async { [weak self] in
 //            Task {
 //                await self?.networkService.executeDownloadTask(priority: .low, jobNumber: 4)
