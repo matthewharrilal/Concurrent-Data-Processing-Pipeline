@@ -72,7 +72,10 @@ class NetworkService: NetworkProtocol {
         downloadOperation.queuePriority = priority
         
         downloadOperation.onFinished = { [weak self] jobNumber in
-            guard let self = self else { return }
+            guard let self = self else {
+                print("Self has been deallocated")
+                return
+            }
             
             print("")
             print("Download operation complete for job #\(jobNumber)")
@@ -81,30 +84,36 @@ class NetworkService: NetworkProtocol {
                 self.counter -= 1
             }
             
-            handlePendingDownloadTasks()
+            self.handlePendingDownloadTasks()
         }
         
         downloadOperationQueue.addOperation(downloadOperation)
     }
     
+    /*
+     Nuanced Note:
+        - The reason we don't remove the pendingOperation from the array and then execute it is b/c pendingDownloadOperations is the only object bridiging and retaining the pendingOperations inside of it to self. If removed, we would lose access to self and the onFinished completion handler would not be invoked here as it would't know where to send the results upon invocation i.e here.
+     */
     private func handlePendingDownloadTasks() {
         counterQueue.sync {
-            guard pendingDownloadOperations.count > 0 else {
+            guard
+                pendingDownloadOperations.count > 0,
+                let pendingOperation = pendingDownloadOperations.first
+            else {
                 print("")
                 print("No pending download tasks to handle.")
                 return
             }
-
-            let pendingOperation = pendingDownloadOperations.removeFirst()
             
             print("")
             print("Re-trying previously pending task job #\(pendingOperation.jobNumber)")
             pendingOperation.startDownloadTask = true
             counter += 1
             
-            pendingOperation.onFinished = { jobNumber in
+            pendingOperation.onFinished = { [weak self] jobNumber in
                 print("")
                 print("Download operation complete for job #\(jobNumber)")
+                self?.pendingDownloadOperations.removeFirst()
             }
         }
     }

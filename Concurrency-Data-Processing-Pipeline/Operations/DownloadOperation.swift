@@ -20,7 +20,9 @@ class DownloadOperation: Operation {
     
     var startDownloadTask: Bool {
         didSet {
-            performDownloadTask()
+            if startDownloadTask {
+                performDownloadTask()
+            }
         }
     }
     
@@ -55,8 +57,12 @@ class DownloadOperation: Operation {
     
     private func performDownloadTask() {
         DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) { [weak self] in
+            guard let self = self else {
+                print("Self has been deallocated")
+                return
+            }
             print("Downloading ... Beep Boop Beep")
-            self?.finish()
+            self.finish()
         }
     }
     
