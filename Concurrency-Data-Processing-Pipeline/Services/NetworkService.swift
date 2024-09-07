@@ -32,7 +32,7 @@ class NetworkService: NetworkProtocol {
     }()
 
     init(
-        maxConcurrentDownloadOperations: Int = 3,
+        maxConcurrentDownloadOperations: Int = 1,
         maxConcurrentTransformationOperations: Int = 2,
         maxConcurrentSaveOperations: Int = 1
     ) {
@@ -43,10 +43,6 @@ class NetworkService: NetworkProtocol {
     
     func startDownloadTask(_ operation: DownloadOperation, wasPreviouslyPending: Bool = false) {
         print("Starting download task for job #\(operation.jobNumber)")
-        
-        if wasPreviouslyPending {
-            operation.startDownloadTask = true
-        }
         
         operation.onFinished = { [weak self] jobNumber in
             guard let self = self else {
@@ -85,17 +81,15 @@ class NetworkService: NetworkProtocol {
                 print("")
                 
                 lock.lock()
-                let pendingOperation = DownloadOperation(
-                    jobNumber: jobNumber,
-                    automaticallyStartDownloadTask: false
-                )
                 
+                let pendingOperation = DownloadOperation(jobNumber: jobNumber)
+
                 pendingOperation.queuePriority = priority
 
-                
                 self.pendingDownloadOperations.append(
                     pendingOperation
                 )
+
                 lock.unlock()
                 
                 return
