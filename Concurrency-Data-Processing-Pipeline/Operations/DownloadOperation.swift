@@ -9,6 +9,11 @@ import Foundation
 
 class DownloadOperation: Operation {
     
+    enum Constants {
+        static let isExecuting: String = "isExecuting"
+        static let isFinished: String = "isFinished"
+    }
+    
     private var _isExecuting: Bool = false
     private var _isFinished: Bool = false
     
@@ -17,15 +22,7 @@ class DownloadOperation: Operation {
     var jobNumber: Int {
         _jobNumber
     }
-    
-    var startDownloadTask: Bool {
-        didSet {
-            if startDownloadTask {
-                performDownloadTask()
-            }
-        }
-    }
-    
+        
     var onFinished: (@Sendable (Int) -> Void)?
     
     override var isExecuting: Bool {
@@ -36,9 +33,8 @@ class DownloadOperation: Operation {
         _isFinished
     }
     
-    init(jobNumber: Int, automaticallyStartDownloadTask: Bool = true) {
+    init(jobNumber: Int) {
         self._jobNumber = jobNumber
-        self.startDownloadTask = automaticallyStartDownloadTask
         super.init()
     }
     
@@ -48,26 +44,26 @@ class DownloadOperation: Operation {
             return
         }
         
+        willChangeValue(forKey: Constants.isExecuting)
         _isExecuting = true
+        didChangeValue(forKey: Constants.isExecuting)
         
-        if startDownloadTask {
-            performDownloadTask()
-        }
+        performDownloadTask()
     }
     
     private func performDownloadTask() {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 2.0) { [weak self] in
-            guard let self = self else {
-                print("Self has been deallocated")
-                return
-            }
-            print("Downloading ... Beep Boop Beep")
-            self.finish()
-        }
+        print("Downloading ... Beep Boop Beep")
+        finish()
     }
     
     private func finish() {
+        willChangeValue(forKey: Constants.isFinished)
         _isFinished = true
+        didChangeValue(forKey: Constants.isFinished)
+        
+        willChangeValue(forKey: Constants.isExecuting)
+        _isExecuting = false
+        didChangeValue(forKey: Constants.isExecuting)
         onFinished?(jobNumber)
     }
 }
