@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 class DownloadOperation: Operation {
     
@@ -17,13 +18,15 @@ class DownloadOperation: Operation {
     private var _isExecuting: Bool = false
     private var _isFinished: Bool = false
     
+    private let networkService: NetworkProtocol
+    private let operationURL: URL
     private let _jobNumber: Int
     
     var jobNumber: Int {
         _jobNumber
     }
         
-    var onFinished: (@Sendable (Int) -> Void)?
+    var onFinished: (@Sendable (Int, UIImage?) -> Void)?
     
     override var isExecuting: Bool {
         _isExecuting
@@ -33,14 +36,20 @@ class DownloadOperation: Operation {
         _isFinished
     }
     
-    init(jobNumber: Int) {
+    init(
+        operationURL: URL,
+        networkService: NetworkProtocol,
+        jobNumber: Int
+    ) {
+        self.operationURL = operationURL
+        self.networkService = networkService
         self._jobNumber = jobNumber
         super.init()
     }
     
     override func start() {
         if isCancelled {
-            finish()
+            finish(with: nil)
             return
         }
         
@@ -53,10 +62,15 @@ class DownloadOperation: Operation {
     
     private func performDownloadTask() {
         print("Downloading ... Beep Boop Beep")
-        finish()
+        
+        Task {
+            let image = await networkService.downloadImage(for: operationURL)
+            finish(with: image)
+        }
     }
     
-    private func finish() {
+    
+    private func finish(with image: UIImage?) {
         willChangeValue(forKey: Constants.isFinished)
         _isFinished = true
         didChangeValue(forKey: Constants.isFinished)
@@ -64,6 +78,6 @@ class DownloadOperation: Operation {
         willChangeValue(forKey: Constants.isExecuting)
         _isExecuting = false
         didChangeValue(forKey: Constants.isExecuting)
-        onFinished?(jobNumber)
+        onFinished?(jobNumber, image)
     }
 }
