@@ -9,10 +9,10 @@ import UIKit
 
 class TestViewController: UIViewController {
     
-    private let networkService: NetworkProtocol
+    private let pipelineService: PipelineProtocol
     
-    init(networkService: NetworkProtocol) {
-        self.networkService = networkService
+    init(pipelineService: PipelineProtocol) {
+        self.pipelineService = pipelineService
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -31,31 +31,15 @@ class TestViewController: UIViewController {
 extension TestViewController {
     
     private func simulateAsyncDownloadTasks() {
-        let highPriorityQueue = DispatchQueue(label: "concurrent.globalQueue", qos: .userInitiated, attributes: .concurrent)
-        let lowPriorityQeue = DispatchQueue(label: "concurrent.globalQueue", qos: .background, attributes: .concurrent)
-        
-        highPriorityQueue.async { [weak self] in
-            Task {
-                await self?.networkService.executeDownloadTask(priority: .veryLow, jobNumber: 4)
-            }
-            
-            Task {
-                await self?.networkService.executeDownloadTask(priority: .veryLow, jobNumber: 5)
-            }
-            
-            Task {
-                await self?.networkService.executeDownloadTask(priority: .veryHigh, jobNumber: 6)
-            }
+        Task {
+            guard let url = URL(string: "https://via.placeholder.com/150/92c952") else { return }
+            await pipelineService.addToPipeline(typeOfTask: .highPriorityDownload(url: url), jobNumber: 7)
         }
-
-        lowPriorityQeue.async { [weak self] in
-            Task {
-                await self?.networkService.executeDownloadTask(priority: .low, jobNumber: 1)
-            }
-            
-            Task {
-                await self?.networkService.executeDownloadTask(priority: .veryHigh, jobNumber: 2)
-            }
+        
+        
+        Task {
+            guard let url = URL(string: "https://via.placeholder.com/150/e30072") else { return }
+            await pipelineService.addToPipeline(typeOfTask: .backgroundPriorityDownload(url: url), jobNumber: 1)
         }
     }
 }
