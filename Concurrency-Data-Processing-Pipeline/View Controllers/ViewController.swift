@@ -31,35 +31,30 @@ class TestViewController: UIViewController {
 extension TestViewController {
     
     private func simulateAsyncDownloadTasks() {
-        let queue = DispatchQueue.global(qos: .userInitiated)
+        let highPriorityQueue = DispatchQueue(label: "concurrent.globalQueue", qos: .userInitiated, attributes: .concurrent)
+        let lowPriorityQeue = DispatchQueue(label: "concurrent.globalQueue", qos: .background, attributes: .concurrent)
         
-        queue.async { [weak self] in
+        highPriorityQueue.async { [weak self] in
             Task {
-                await self?.networkService.executeDownloadTask(priority: .veryHigh, jobNumber: 1)
+                await self?.networkService.executeDownloadTask(priority: .veryLow, jobNumber: 4)
             }
-        }
-        
-        queue.async { [weak self] in
+            
             Task {
-                await self?.networkService.executeDownloadTask(priority: .veryLow, jobNumber: 2)
+                await self?.networkService.executeDownloadTask(priority: .veryLow, jobNumber: 5)
             }
-        }
-     
-        queue.async { [weak self] in
+            
             Task {
-                await self?.networkService.executeDownloadTask(priority: .normal, jobNumber: 3)
+                await self?.networkService.executeDownloadTask(priority: .veryHigh, jobNumber: 6)
             }
         }
 
-        queue.async { [weak self] in
+        lowPriorityQeue.async { [weak self] in
             Task {
-                await self?.networkService.executeDownloadTask(priority: .low, jobNumber: 4)
+                await self?.networkService.executeDownloadTask(priority: .low, jobNumber: 1)
             }
-        }
-        
-        queue.async { [weak self] in
+            
             Task {
-                await self?.networkService.executeDownloadTask(priority: .veryHigh, jobNumber: 5)
+                await self?.networkService.executeDownloadTask(priority: .veryHigh, jobNumber: 2)
             }
         }
     }

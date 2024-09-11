@@ -31,7 +31,7 @@ class NetworkService: NetworkProtocol {
     }()
 
     init(
-        maxConcurrentDownloadOperations: Int = 3,
+        maxConcurrentDownloadOperations: Int = 2,
         maxConcurrentTransformationOperations: Int = 2,
         maxConcurrentSaveOperations: Int = 1
     ) {
