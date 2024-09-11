@@ -19,7 +19,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let _ = (scene as? UIWindowScene) else { return }
         
         let networkService = NetworkService()
-        window?.rootViewController = TestViewController(networkService: networkService)
+        let downloadService = DownloadService(networkService: networkService)
+
+        let pipelineService = PipelineService(downloadService: downloadService)
+        window?.rootViewController = TestViewController(pipelineService: pipelineService)
         window?.makeKeyAndVisible()
     }
 
