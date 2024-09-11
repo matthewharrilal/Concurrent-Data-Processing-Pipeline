@@ -21,7 +21,6 @@ class NetworkService: NetworkProtocol {
     private var pendingDownloadOperations: [DownloadOperation] = []
     
     private var counter: Int = 0
-    private let lock = NSLock()
     private lazy var counterQueue = DispatchQueue(label: "serial.counterQueue")
     
     private lazy var downloadOperationQueue: OperationQueue = {
@@ -32,7 +31,7 @@ class NetworkService: NetworkProtocol {
     }()
 
     init(
-        maxConcurrentDownloadOperations: Int = 1,
+        maxConcurrentDownloadOperations: Int = 3,
         maxConcurrentTransformationOperations: Int = 2,
         maxConcurrentSaveOperations: Int = 1
     ) {
@@ -41,8 +40,14 @@ class NetworkService: NetworkProtocol {
         self.maxConcurrentSaveOperations = maxConcurrentSaveOperations
     }
     
-    func startDownloadTask(_ operation: DownloadOperation, wasPreviouslyPending: Bool = false) {
+    func startDownloadTask(_ operation: DownloadOperation) {
+        guard !operation.isFinished, !operation.isExecuting else {
+            print("Operation for job #\(operation.jobNumber) is already finished or executing. Skipping...")
+            return
+        }
+        
         print("Starting download task for job #\(operation.jobNumber)")
+        downloadOperationQueue.addOperation(operation)
         
         operation.onFinished = { [weak self] jobNumber in
             guard let self = self else {
@@ -56,16 +61,10 @@ class NetworkService: NetworkProtocol {
             
             self.counterQueue.sync {
                 self.counter -= 1 // Decrement counter of current operation since operation has been completed
-                
-                if wasPreviouslyPending {
-                    self.pendingDownloadOperations.removeFirst()
-                }
             }
             
             self.handlePendingDownloadTasks()
         }
-        
-        downloadOperationQueue.addOperation(operation)
     }
     
     func executeDownloadTask(priority: Operation.QueuePriority, jobNumber: Int) async {
@@ -79,9 +78,7 @@ class NetworkService: NetworkProtocol {
                 print("")
                 print("Couldn't immedieately execute Job #\(jobNumber), will execute it after a task completes")
                 print("")
-                
-                lock.lock()
-                
+                                
                 let pendingOperation = DownloadOperation(jobNumber: jobNumber)
 
                 pendingOperation.queuePriority = priority
@@ -89,8 +86,6 @@ class NetworkService: NetworkProtocol {
                 self.pendingDownloadOperations.append(
                     pendingOperation
                 )
-
-                lock.unlock()
                 
                 return
             }
@@ -106,6 +101,8 @@ class NetworkService: NetworkProtocol {
         - The reason we don't remove the pendingOperation from the array and then execute it is b/c pendingDownloadOperations is the only object bridiging and retaining the pendingOperations inside of it to self. If removed, we would lose access to self and the onFinished completion handler would not be invoked here as it would't know where to send the results upon invocation i.e here.
      */
     private func handlePendingDownloadTasks() {
+        var nextPendingOperation: DownloadOperation?
+        
         counterQueue.sync {
             guard
                 pendingDownloadOperations.count > 0,
@@ -119,10 +116,16 @@ class NetworkService: NetworkProtocol {
             print("")
             print("Re-trying previously pending task job #\(pendingOperation.jobNumber)")
             print("")
-
-            counter += 1
             
-            startDownloadTask(pendingOperation, wasPreviouslyPending: true)
+            // Need to access the first operation in pending operations before we remove so that we don't lose reference to self when invoking onFinished
+            nextPendingOperation = pendingOperation
+            pendingDownloadOperations.removeFirst()
+            
+            counter += 1
+        }
+        
+        if let nextPendingOperation = nextPendingOperation {
+            startDownloadTask(nextPendingOperation)
         }
     }
 }
