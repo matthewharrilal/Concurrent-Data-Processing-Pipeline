@@ -20,6 +20,10 @@ protocol PipelineProtocol {
 
 class PipelineService: PipelineProtocol {
     
+    private lazy var highPriorityQueue = DispatchQueue(label: "concurrent.highPriority", qos: .userInitiated, attributes: .concurrent)
+    private lazy var standardPriorityQueue = DispatchQueue(label: "concurrent.standardPriority", qos: .utility, attributes: .concurrent)
+    private lazy var backgroundPriorityQueue = DispatchQueue(label: "concurrent.backgroundPriority", qos: .background, attributes: .concurrent)
+    
     private let downloadService: DownloadService
     
     init(downloadService: DownloadService) {
@@ -36,17 +40,29 @@ class PipelineService: PipelineProtocol {
         case .highPriorityDownload(let url):
             print("URL for high priority download \(url)")
             print("")
-            await invokeDownloadTask(with: url, priority: .veryHigh, jobNumber: jobNumber)
+            
+            highPriorityQueue.async { [weak self] in
+                self?.invokeDownloadTask(with: url, priority: .veryHigh, jobNumber: jobNumber)
+            }
+            
             break
         case .standardPriorityDownload(let url):
             print("URL for standard priority download \(url)")
             print("")
-            await invokeDownloadTask(with: url, priority: .normal, jobNumber: jobNumber)
+            
+            standardPriorityQueue.async { [weak self] in
+                self?.invokeDownloadTask(with: url, priority: .normal, jobNumber: jobNumber)
+            }
+            
             break
         case.backgroundPriorityDownload(let url):
             print("URL for background priority download \(url)")
             print("")
-            await invokeDownloadTask(with: url, priority: .veryLow, jobNumber: jobNumber)
+            
+            backgroundPriorityQueue.async { [weak self] in
+                self?.invokeDownloadTask(with: url, priority: .veryLow, jobNumber: jobNumber)
+            }
+            
             break
         }
     }
@@ -54,11 +70,13 @@ class PipelineService: PipelineProtocol {
 
 private extension PipelineService {
     
-    func invokeDownloadTask(with url: URL, priority: Operation.QueuePriority, jobNumber: Int) async {
-        await downloadService.executeDownloadTask(
-            url: url,
-            priority: priority,
-            jobNumber: jobNumber
-        )
+    func invokeDownloadTask(with url: URL, priority: Operation.QueuePriority, jobNumber: Int) {
+        Task {
+            await downloadService.executeDownloadTask(
+                url: url,
+                priority: priority,
+                jobNumber: jobNumber
+            )
+        }
     }
 }

@@ -32,14 +32,29 @@ extension TestViewController {
     
     private func simulateAsyncDownloadTasks() {
         Task {
-            guard let url = URL(string: "https://via.placeholder.com/150/92c952") else { return }
-            await pipelineService.addToPipeline(typeOfTask: .highPriorityDownload(url: url), jobNumber: 7)
+            guard let url = URL(string: "https://via.placeholder.com/150/e30072") else { return }
+            await pipelineService.addToPipeline(typeOfTask: .backgroundPriorityDownload(url: url), jobNumber: 1)
+        }
+        
+        Task {
+            guard let url = URL(string: "https://via.placeholder.com/150/e30072") else { return }
+            await pipelineService.addToPipeline(typeOfTask: .backgroundPriorityDownload(url: url), jobNumber: 2)
+        }
+        
+        Task {
+            guard let url = URL(string: "https://via.placeholder.com/150/e30072") else { return }
+            await pipelineService.addToPipeline(typeOfTask: .backgroundPriorityDownload(url: url), jobNumber: 3)
         }
         
         
         Task {
             guard let url = URL(string: "https://via.placeholder.com/150/e30072") else { return }
-            await pipelineService.addToPipeline(typeOfTask: .backgroundPriorityDownload(url: url), jobNumber: 1)
+            await pipelineService.addToPipeline(typeOfTask: .backgroundPriorityDownload(url: url), jobNumber: 4)
+        }
+        
+        Task {
+            guard let url = URL(string: "https://via.placeholder.com/150/92c952") else { return }
+            await pipelineService.addToPipeline(typeOfTask: .highPriorityDownload(url: url), jobNumber: 7)
         }
     }
 }
