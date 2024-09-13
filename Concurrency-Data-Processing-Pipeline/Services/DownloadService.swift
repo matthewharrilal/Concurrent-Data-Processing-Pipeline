@@ -16,16 +16,12 @@ class DownloadService: DownloadProtocol {
     
     private let networkService: NetworkProtocol
     private let maxConcurrentDownloadOperations: Int
-    private let maxConcurrentTransformationOperations: Int
-    private let maxConcurrentSaveOperations: Int
     
     private var pendingDownloadOperations: [DownloadOperation] = []
     
     private var counter: Int = 0
     private lazy var counterQueue = DispatchQueue(label: "serial.counterQueue")
-    
-    public var onFinishedDownload: ((Int, UIImage?) -> Void)?
-    
+        
     private lazy var downloadOperationQueue: OperationQueue = {
         let queue = OperationQueue()
         queue.maxConcurrentOperationCount = maxConcurrentDownloadOperations
@@ -35,14 +31,10 @@ class DownloadService: DownloadProtocol {
     
     init(
         networkService: NetworkProtocol,
-        maxConcurrentDownloadOperations: Int = 2,
-        maxConcurrentTransformationOperations: Int = 2,
-        maxConcurrentSaveOperations: Int = 1
+        maxConcurrentDownloadOperations: Int = 4
     ) {
         self.networkService = networkService
         self.maxConcurrentDownloadOperations = maxConcurrentDownloadOperations
-        self.maxConcurrentTransformationOperations = maxConcurrentTransformationOperations
-        self.maxConcurrentSaveOperations = maxConcurrentSaveOperations
     }
     
     func executeDownloadTask(url: URL, priority: Operation.QueuePriority, jobNumber: Int) async {
@@ -100,7 +92,6 @@ private extension DownloadService {
                 return
             }
             
-            self.onFinishedDownload?(jobNumber, image)
             print("Download operation complete for job #\(jobNumber)")
             print("")
             

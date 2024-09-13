@@ -25,8 +25,6 @@ class DownloadOperation: Operation {
     var jobNumber: Int {
         _jobNumber
     }
-        
-    var onFinished: (@Sendable (Int, UIImage?) -> Void)?
     
     override var isExecuting: Bool {
         _isExecuting
@@ -78,6 +76,5 @@ class DownloadOperation: Operation {
         willChangeValue(forKey: Constants.isExecuting)
         _isExecuting = false
         didChangeValue(forKey: Constants.isExecuting)
-        onFinished?(jobNumber, image)
     }
 }

@@ -28,11 +28,6 @@ class PipelineService: PipelineProtocol {
     
     init(downloadService: DownloadService) {
         self.downloadService = downloadService
-        
-        downloadService.onFinishedDownload = { [weak self] (jobNumber: Int, image: UIImage?) in
-            print("")
-            print("Here is your image, sir \(image) for job #\(jobNumber)")
-        }
     }
     
     func addToPipeline(typeOfTask: TaskType, jobNumber: Int) async {
@@ -70,6 +65,7 @@ class PipelineService: PipelineProtocol {
 
 private extension PipelineService {
     
+    // MARK: TODO Refactor to use Task Priority over Operation.QueuePriority allows us to remove different dispatch queues entirely
     func invokeDownloadTask(with url: URL, priority: Operation.QueuePriority, jobNumber: Int) {
         Task {
             await downloadService.executeDownloadTask(
