@@ -25,6 +25,8 @@ class DownloadOperation: Operation {
     var jobNumber: Int {
         _jobNumber
     }
+        
+    var onFinished: (@Sendable (Int) -> Void)?
     
     override var isExecuting: Bool {
         _isExecuting
@@ -47,7 +49,7 @@ class DownloadOperation: Operation {
     
     override func start() {
         if isCancelled {
-            finish(with: nil)
+            finish()
             return
         }
         
@@ -63,12 +65,12 @@ class DownloadOperation: Operation {
         
         Task {
             let image = await networkService.downloadImage(for: operationURL)
-            finish(with: image)
+            finish()
         }
     }
     
     
-    private func finish(with image: UIImage?) {
+    private func finish() {
         willChangeValue(forKey: Constants.isFinished)
         _isFinished = true
         didChangeValue(forKey: Constants.isFinished)
@@ -76,5 +78,6 @@ class DownloadOperation: Operation {
         willChangeValue(forKey: Constants.isExecuting)
         _isExecuting = false
         didChangeValue(forKey: Constants.isExecuting)
+        onFinished?(jobNumber)
     }
 }

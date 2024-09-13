@@ -86,7 +86,7 @@ private extension DownloadService {
         print("Starting download task for job #\(operation.jobNumber)")
         downloadOperationQueue.addOperation(operation)
         
-        operation.onFinished = { [weak self] (jobNumber: Int, image: UIImage?) in
+        operation.onFinished = { [weak self] jobNumber in
             guard let self = self else {
                 print("Self has been deallocated")
                 return
