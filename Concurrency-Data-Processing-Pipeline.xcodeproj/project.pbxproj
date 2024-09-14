@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		767C75FF2C9201850008D8DB /* Pipeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 767C75FE2C9201850008D8DB /* Pipeline.swift */; };
 		767C76012C920BAD0008D8DB /* DownloadService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 767C76002C920BAD0008D8DB /* DownloadService.swift */; };
+		767C76042C96187F0008D8DB /* TaskPriority+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 767C76032C96187F0008D8DB /* TaskPriority+Extension.swift */; };
 		76C15D972C8B53630055E2D6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C15D962C8B53630055E2D6 /* AppDelegate.swift */; };
 		76C15D992C8B53630055E2D6 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C15D982C8B53630055E2D6 /* SceneDelegate.swift */; };
 		76C15D9B2C8B53630055E2D6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C15D9A2C8B53630055E2D6 /* ViewController.swift */; };
@@ -42,6 +43,7 @@
 /* Begin PBXFileReference section */
 		767C75FE2C9201850008D8DB /* Pipeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pipeline.swift; sourceTree = "<group>"; };
 		767C76002C920BAD0008D8DB /* DownloadService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadService.swift; sourceTree = "<group>"; };
+		767C76032C96187F0008D8DB /* TaskPriority+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TaskPriority+Extension.swift"; sourceTree = "<group>"; };
 		76C15D932C8B53630055E2D6 /* Concurrency-Data-Processing-Pipeline.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Concurrency-Data-Processing-Pipeline.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		76C15D962C8B53630055E2D6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		76C15D982C8B53630055E2D6 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -92,6 +94,14 @@
 			path = Pipeline;
 			sourceTree = "<group>";
 		};
+		767C76022C9618740008D8DB /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				767C76032C96187F0008D8DB /* TaskPriority+Extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		76C15D8A2C8B53630055E2D6 = {
 			isa = PBXGroup;
 			children = (
@@ -115,6 +125,7 @@
 		76C15D952C8B53630055E2D6 /* Concurrency-Data-Processing-Pipeline */ = {
 			isa = PBXGroup;
 			children = (
+				767C76022C9618740008D8DB /* Extensions */,
 				767C75FD2C9201650008D8DB /* Pipeline */,
 				76C15DD52C8BB06B0055E2D6 /* Operations */,
 				76C15DCE2C8B63270055E2D6 /* Services */,
@@ -306,6 +317,7 @@
 				767C76012C920BAD0008D8DB /* DownloadService.swift in Sources */,
 				76C15DD72C8BB0770055E2D6 /* DownloadOperation.swift in Sources */,
 				76C15D972C8B53630055E2D6 /* AppDelegate.swift in Sources */,
+				767C76042C96187F0008D8DB /* TaskPriority+Extension.swift in Sources */,
 				767C75FF2C9201850008D8DB /* Pipeline.swift in Sources */,
 				76C15DD42C8B671B0055E2D6 /* NetworkService.swift in Sources */,
 				76C15D992C8B53630055E2D6 /* SceneDelegate.swift in Sources */,
