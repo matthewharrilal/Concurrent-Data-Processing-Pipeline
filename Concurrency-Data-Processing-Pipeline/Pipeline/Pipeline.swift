@@ -19,11 +19,6 @@ protocol PipelineProtocol {
 }
 
 class PipelineService: PipelineProtocol {
-    
-    private lazy var highPriorityQueue = DispatchQueue(label: "concurrent.highPriority", qos: .userInitiated, attributes: .concurrent)
-    private lazy var standardPriorityQueue = DispatchQueue(label: "concurrent.standardPriority", qos: .utility, attributes: .concurrent)
-    private lazy var backgroundPriorityQueue = DispatchQueue(label: "concurrent.backgroundPriority", qos: .background, attributes: .concurrent)
-    
     private let downloadService: DownloadService
     
     init(downloadService: DownloadService) {
@@ -36,27 +31,21 @@ class PipelineService: PipelineProtocol {
             print("URL for high priority download \(url)")
             print("")
             
-            highPriorityQueue.async { [weak self] in
-                self?.invokeDownloadTask(with: url, priority: .veryHigh, jobNumber: jobNumber)
-            }
+            invokeDownloadTask(with: url, priority: .userInitiated, jobNumber: jobNumber)
             
             break
         case .standardPriorityDownload(let url):
             print("URL for standard priority download \(url)")
             print("")
             
-            standardPriorityQueue.async { [weak self] in
-                self?.invokeDownloadTask(with: url, priority: .normal, jobNumber: jobNumber)
-            }
+            invokeDownloadTask(with: url, priority: .medium, jobNumber: jobNumber)
             
             break
         case.backgroundPriorityDownload(let url):
             print("URL for background priority download \(url)")
             print("")
             
-            backgroundPriorityQueue.async { [weak self] in
-                self?.invokeDownloadTask(with: url, priority: .veryLow, jobNumber: jobNumber)
-            }
+            invokeDownloadTask(with: url, priority: .background, jobNumber: jobNumber)
             
             break
         }
@@ -65,12 +54,11 @@ class PipelineService: PipelineProtocol {
 
 private extension PipelineService {
     
-    // MARK: TODO Refactor to use Task Priority over Operation.QueuePriority allows us to remove different dispatch queues entirely
-    func invokeDownloadTask(with url: URL, priority: Operation.QueuePriority, jobNumber: Int) {
-        Task {
+    func invokeDownloadTask(with url: URL, priority: TaskPriority, jobNumber: Int) {
+        Task(priority: priority) {
             await downloadService.executeDownloadTask(
                 url: url,
-                priority: priority,
+                priority: priority.toOperationQueuePriority(),
                 jobNumber: jobNumber
             )
         }
