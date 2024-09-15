@@ -34,28 +34,46 @@ extension TestViewController {
         Task {
             guard let url = URL(string: "https://via.placeholder.com/150/e13072") else { return }
             
-            do {
-                let image = try await pipelineService.addToPipeline(typeOfTask: .highPriorityDownload(url: url), jobNumber: 1)
-                print("")
-                print(image)
-            }
-            catch {
-                print(error.localizedDescription)
+            let eventStream = await pipelineService.addToPipeline(typeOfTask: .highPriorityDownload(url: url), jobNumber: 1)
+            
+            for await event in eventStream {
+                switch event {
+                case .downloadStarted:
+                    print("Download Started")
+                    break
+                case .downloaded(let image):
+                    print("Obtained Image \(image)")
+                    break
+                case .failed(let error):
+                    print("Received Error \(error)")
+                    break
+                default:
+                    break
+                }
             }
         }
         
-        Task {
-            guard let url = URL(string: "https://via.placeholder.com/150/e30072") else { return }
-            
-            do {
-                let image = try await pipelineService.addToPipeline(typeOfTask: .backgroundPriorityDownload(url: url), jobNumber: 2)
-                print("")
-                print(image)
-            }
-            catch {
-                print(error.localizedDescription)
-            }
-        }
+//        Task {
+//            guard let url = URL(string: "https://via.placeholder.com/150/e30072") else { return }
+//            
+//            let eventStream = await pipelineService.addToPipeline(typeOfTask: .backgroundPriorityDownload(url: url), jobNumber: 2)
+//            
+//            for await event in eventStream {
+//                switch event {
+//                case .downloadStarted:
+//                    print("Download Started")
+//                    break
+//                case .downloaded(let image):
+//                    print("Obtained Image \(image)")
+//                    break
+//                case .failed(let error):
+//                    print("Received Error \(error)")
+//                    break
+//                default:
+//                    break
+//                }
+//            }
+//        }
     }
 }
 
