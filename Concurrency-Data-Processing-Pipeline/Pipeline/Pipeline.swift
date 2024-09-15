@@ -15,7 +15,7 @@ enum TaskType {
 }
 
 protocol PipelineProtocol {
-    func addToPipeline(typeOfTask: TaskType, jobNumber: Int) async -> AsyncStream<PipelineEvent>
+    func addToPipeline(typeOfTask: TaskType, jobNumber: Int) async -> AsyncThrowingStream<PipelineEvent, Error>
 }
 
 enum PipelineEvent {
@@ -33,8 +33,8 @@ class PipelineService: PipelineProtocol {
         self.downloadService = downloadService
     }
     
-    func addToPipeline(typeOfTask: TaskType, jobNumber: Int) async -> AsyncStream<PipelineEvent> {
-        return AsyncStream { continuation in
+    func addToPipeline(typeOfTask: TaskType, jobNumber: Int) async -> AsyncThrowingStream<PipelineEvent, Error> {
+        return AsyncThrowingStream { continuation in
             Task { // Switches internal logic to concurrent context allowing parallel execution with other pipeline tasks otherwise would block due to the caller of this method being on the main thread
                 let priority: TaskPriority
                 let taskURL: URL
@@ -69,7 +69,7 @@ class PipelineService: PipelineProtocol {
                     continuation.yield(.downloaded(image))
                 }
                 catch {
-                    continuation.yield(.failed(error))
+                    continuation.finish(throwing: error)
                 }
                 
                 continuation.finish()
