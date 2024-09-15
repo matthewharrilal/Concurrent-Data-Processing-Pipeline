@@ -9,19 +9,27 @@ import Foundation
 import UIKit
 
 protocol NetworkProtocol {
-    func downloadImage(for url: URL) async -> UIImage?
+    func downloadImage(for url: URL) async throws -> UIImage
 }
 
 class NetworkService: NetworkProtocol {
     
-    func downloadImage(for url: URL) async -> UIImage? {
+    enum NetworkError: Error {
+        case invalidData
+        case downloadError
+    }
+    
+    func downloadImage(for url: URL) async throws -> UIImage {
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
-            return UIImage(data: data)
+            guard let image = UIImage(data: data) else {
+                throw NetworkError.invalidData
+            }
+            
+            return image
         }
         catch {
-            print("Error downloading UIImage")
-            return nil
+            throw NetworkError.downloadError
         }
     }
 }

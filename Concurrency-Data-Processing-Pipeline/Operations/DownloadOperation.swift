@@ -21,6 +21,7 @@ class DownloadOperation: Operation {
     private let networkService: NetworkProtocol
     private let operationURL: URL
     private let _jobNumber: Int
+    private let continuation: CheckedContinuation<UIImage, Error>
     
     var jobNumber: Int {
         _jobNumber
@@ -39,11 +40,13 @@ class DownloadOperation: Operation {
     init(
         operationURL: URL,
         networkService: NetworkProtocol,
-        jobNumber: Int
+        jobNumber: Int,
+        continuation: CheckedContinuation<UIImage, Error>
     ) {
         self.operationURL = operationURL
         self.networkService = networkService
         self._jobNumber = jobNumber
+        self.continuation = continuation
         super.init()
     }
     
@@ -64,7 +67,15 @@ class DownloadOperation: Operation {
         print("Downloading ... Beep Boop Beep")
         
         Task {
-            let image = await networkService.downloadImage(for: operationURL)
+            do {
+                let image = try await networkService.downloadImage(for: operationURL)
+                continuation.resume(returning: image)
+            }
+            catch {
+                print("Error: \(error.localizedDescription)")
+                continuation.resume(throwing: error)
+            }
+            
             finish()
         }
     }

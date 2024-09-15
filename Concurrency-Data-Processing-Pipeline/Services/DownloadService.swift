@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 protocol DownloadProtocol {
-    func executeDownloadTask(url: URL, priority: Operation.QueuePriority, jobNumber: Int) async
+    func executeDownloadTask(url: URL, priority: Operation.QueuePriority, jobNumber: Int) async throws -> UIImage
 }
 
 class DownloadService: DownloadProtocol {
@@ -37,40 +37,44 @@ class DownloadService: DownloadProtocol {
         self.maxConcurrentDownloadOperations = maxConcurrentDownloadOperations
     }
     
-    func executeDownloadTask(url: URL, priority: Operation.QueuePriority, jobNumber: Int) async {
-        counterQueue.sync { [weak self] in
-            guard let self = self else { return }
-            self.counter += 1
-            
-            guard self.counter <= maxConcurrentDownloadOperations else {
-                self.counter -= 1
+    func executeDownloadTask(url: URL, priority: Operation.QueuePriority, jobNumber: Int) async throws -> UIImage {
+        
+        return try await withCheckedThrowingContinuation { continuation in
+            counterQueue.sync { [weak self] in
+                guard let self = self else { return }
+                self.counter += 1
                 
-                print("")
-                print("Couldn't immedieately execute Job #\(jobNumber), will execute it after a task completes")
-                print("")
+                guard self.counter <= maxConcurrentDownloadOperations else {
+                    self.counter -= 1
+                    
+                    print("")
+                    print("Couldn't immedieately execute Job #\(jobNumber), will execute it after a task completes")
+                    print("")
+                    
+                    let pendingOperation = DownloadOperation(
+                        operationURL: url,
+                        networkService: networkService,
+                        jobNumber: jobNumber,
+                        continuation: continuation
+                    )
+                    
+                    pendingOperation.queuePriority = priority
+                    self.pendingDownloadOperations.append(
+                        pendingOperation
+                    )
+                    
+                    return
+                }
                 
-                let pendingOperation = DownloadOperation(
+                let downloadOperation = DownloadOperation(
                     operationURL: url,
                     networkService: networkService,
-                    jobNumber: jobNumber
+                    jobNumber: jobNumber,
+                    continuation: continuation
                 )
-                
-                pendingOperation.queuePriority = priority
-                
-                self.pendingDownloadOperations.append(
-                    pendingOperation
-                )
-                
-                return
+                downloadOperation.queuePriority = priority
+                startDownloadTask(downloadOperation)
             }
-            
-            let downloadOperation = DownloadOperation(
-                operationURL: url,
-                networkService: networkService,
-                jobNumber: jobNumber
-            )
-            downloadOperation.queuePriority = priority
-            startDownloadTask(downloadOperation)
         }
     }
 }
